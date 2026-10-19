@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: chargesure_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://chargesure:chargesure_secret@db:5432/chargesure_db
+      - SECRET_KEY=chargesure-super-secret-production-key-2026-ev-safe
+      - DEMO_MODE=true
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: chargesure_postgis_db
+    environment:
+      - POSTGRES_USER=chargesure
+      - POSTGRES_PASSWORD=chargesure_secret
+      - POSTGRES_DB=chargesure_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
